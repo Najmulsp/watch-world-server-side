@@ -35,9 +35,45 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     app.get('/allProducts', async (req, res) =>{
-        const result = await productCollection.find().toArray();
-        res.send(result);
-    })
+      const { sort, brand, category, priceRange, search } = req.query;
+      let query = {};
+
+      // Search filter
+      if (search) {
+        query.name = { $regex: search, $options: 'i' }; // Case insensitive search
+      }
+
+      // Brand filter
+      if (brand) {
+        query.brand = { $regex: brand, $options: 'i' }; // Case insensitive filter
+      }
+
+      // Category filter
+      if (category) {
+        query.category = { $regex: category, $options: 'i' }; // Case insensitive filter
+      }
+
+      // Price range filter
+      if (priceRange) {
+        const [min, max] = priceRange.split('-').map(Number);
+        query.price = { $gte: min, $lte: max };
+      }
+
+      // Fetch the products from the database
+      let products = await productCollection.find(query).toArray();
+
+      // Sorting
+      if (sort === 'price-asc') {
+        products.sort((a, b) => a.price - b.price);
+      } else if (sort === 'price-desc') {
+        products.sort((a, b) => b.price - a.price);
+      } else if (sort === 'date-desc') {
+        products.sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+
+      res.json(products);
+    
+    });
 
 
 
