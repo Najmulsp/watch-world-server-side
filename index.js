@@ -35,7 +35,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     app.get('/allProducts', async (req, res) =>{
-      const { sort, brand, category, priceRange, search } = req.query;
+      const { sort, brand, category, priceRange, search, page = 1, limit = 8 } = req.query;
       let query = {};
 
       // Search filter
@@ -59,8 +59,11 @@ async function run() {
         query.price = { $gte: min, $lte: max };
       }
 
+      // Calculate the skip value
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+
       // Fetch the products from the database
-      let products = await productCollection.find(query).toArray();
+      let products = await productCollection.find(query).skip(skip).limit(parseInt(limit)).toArray();
 
       // Sorting
       if (sort === 'price-asc') {
@@ -71,7 +74,11 @@ async function run() {
         products.sort((a, b) => new Date(b.date) - new Date(a.date));
       }
 
-      res.json(products);
+      // Get total count for pagination
+      const total = await productCollection.countDocuments(query);
+
+      res.json({ products, total });
+    
     
     });
 
