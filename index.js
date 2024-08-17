@@ -6,15 +6,8 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
 
 // middleware
-app.use(cors({
-  origin: ['http://localhost:5173',
-    ]
-}));
+app.use(cors());
 app.use(express.json());
-
-
-
-
 
 
 const uri = `mongodb+srv://${process.env.USER_DB}:${process.env.PASS_DB}@cluster0.njogpdx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -83,16 +76,12 @@ async function run() {
       res.json({ products, total });
     });
 
-
-
-
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
 run().catch(console.dir);
-
 
 app.get('/', (req, res) =>{
     res.send('watch world is running on server')
