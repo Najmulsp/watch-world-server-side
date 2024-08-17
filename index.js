@@ -6,7 +6,10 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173',
+    ]
+}));
 app.use(express.json());
 
 
@@ -40,17 +43,17 @@ async function run() {
 
       // Search filter
       if (search) {
-        query.name = { $regex: search, $options: 'i' }; // Case insensitive search
+        query.name = { $regex: search, $options: 'i' };
       }
 
       // Brand filter
       if (brand) {
-        query.brand = { $regex: brand, $options: 'i' }; // Case insensitive filter
+        query.brand = { $regex: brand, $options: 'i' };
       }
 
       // Category filter
       if (category) {
-        query.category = { $regex: category, $options: 'i' }; // Case insensitive filter
+        query.category = { $regex: category, $options: 'i' };
       }
 
       // Price range filter
@@ -78,8 +81,6 @@ async function run() {
       const total = await productCollection.countDocuments(query);
 
       res.json({ products, total });
-    
-    
     });
 
 
