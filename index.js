@@ -1,14 +1,14 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
-const cors = require('cors')
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
-require('dotenv').config()
+require('dotenv').config();
 
-// middleware
+// Middleware
 app.use(cors());
-app.use(express.json());
 
+app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.USER_DB}:${process.env.PASS_DB}@cluster0.njogpdx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -23,14 +23,12 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // Connect the client to the server (optional starting in v4.7)
+    // await client.connect();
     const productCollection = client.db('WatchWorld').collection('products');
-    // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
-    app.get('/allProducts', async (req, res) =>{
+    // Endpoint to fetch all products
+    app.get('/allProducts', async (req, res) => {
       const { sort, brand, category, priceRange, search, page = 1, limit = 8 } = req.query;
       let query = {};
 
@@ -83,10 +81,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get('/', (req, res) =>{
-    res.send('watch world is running on server')
-})
+app.get('/', (req, res) => {
+  res.send('watch world is running on server');
+});
 
-app.listen(port, () =>{
-    console.log(`watch world is running on port ${port}`);
-})
+app.listen(port, () => {
+  console.log(`watch world is running on port ${port}`);
+});
